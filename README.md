@@ -1,4 +1,4 @@
-CIC
+CIconnect
 ===
 
 CIconnect: CodeIgniter Connect - Facebook PHP SDK
