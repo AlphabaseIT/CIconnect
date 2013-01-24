@@ -31,4 +31,31 @@ class Connect extends CI_Controller
 			var_dump($this->CIconnect->user);
 		}
 	}
+	
+	public function deauthorize()
+	{
+		$this->load->library('email');
+		$this->email->from('me@gerardnijboer.com', 'CIconnect');
+		$this->email->to('me@gerardnijboer.com'); 
+		$this->email->subject('Deauthorized');
+		$this->email->message(print_r($this->CIconnect->parse_signed_request($_REQUEST['signed_request']), true));	
+		$this->email->send();
+		if ($this->CIconnect->logged_in() === TRUE)
+		{
+			$user = $this->CIconnect->delete_user($this->CIconnect->user['id']);
+			if (isset($user['email']))
+			{
+				$this->load->library('email');
+				$this->email->from('me@gerardnijboer.com', 'CIconnect');
+				$this->email->to($user['email']); 
+				$this->email->cc('me@gerardnijboer.com'); 
+				$this->email->subject('Deauthorized');
+				$this->email->message(print_r($_REQUEST, true).'We have deauthorized you from the Facebook application.');	
+				$this->email->send();
+			}
+		}
+	}
 }
+
+/* End of file connect.php */
+/* Location: ./application/controllers/connect.php */

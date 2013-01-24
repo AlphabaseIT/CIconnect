@@ -150,6 +150,8 @@ class CIconnect extends CI_Model
 	 * Check if a set of permissions is set
 	 * 
 	 * @access	public
+	 * @param	string	$permissions	Comma-separated list of scope entities
+	 * @param	bool	$force	Whether or not to force the having of these permissions
 	 */
 	public function has_permissions($permissions, $force = FALSE)
 	{
@@ -176,6 +178,7 @@ class CIconnect extends CI_Model
 	 * Check of the user is admin of a given page
 	 * 
 	 * @access	public
+	 * @param	int	$page	The page id
 	 */
 	public function is_page_admin($page)
 	{
@@ -186,6 +189,7 @@ class CIconnect extends CI_Model
 	 * Check if we already have this user in our database
 	 * 
 	 * @access	public
+	 * @param	int	$id	The user id
 	 */
 	public function is_new_user($id)
 	{
@@ -200,6 +204,8 @@ class CIconnect extends CI_Model
 	 * Check if the local user account in database requires an update
 	 * 
 	 * @access	public
+	 * @param	int	$id	The user id
+	 * @param	string	$timestamp	The timestamp for last updating the user profile as delivered by Facebook
 	 */
 	public function account_needs_update($id, $timestamp)
 	{
@@ -215,6 +221,8 @@ class CIconnect extends CI_Model
 	 * Update account, either existing or new in database
 	 * 
 	 * @access	public
+	 * @param	array	$user	The user object
+	 * @param	bool	$new	Whether we are inserting a new profile or updating an existing one
 	 */
 	public function update_account($user, $new = FALSE)
 	{
@@ -265,6 +273,7 @@ class CIconnect extends CI_Model
 	 * Post a message to the user's wall
 	 * 
 	 * @access	public
+	 * @param	array	$params	Parameters to pass to posting to the user wall
 	 */
 	public function post_to_wall($params)
 	{
@@ -281,6 +290,7 @@ class CIconnect extends CI_Model
 	 * Delete the user details from the database when de-authorized
 	 * 
 	 * @access	public
+	 * @param	int	$id	The user id
 	 */
 	public function delete_user($id)
 	{
@@ -300,6 +310,27 @@ class CIconnect extends CI_Model
 			;');
 		return $user;
 	}
+	
+	/**
+	 * Parse a signed request
+	 * 
+	 * @access	public
+	 * @param	string	$request	The signed request delivered by Facebook
+	 */
+	public function parse_signed_request($request = FALSE)
+	{
+		if ($request != FALSE)
+		{
+			$encoded_sig = NULL;
+			$payload = NULL;
+			list($encoded_sig, $payload) = explode('.', $request, 2);
+			$sig = base64_decode(strtr($encoded_sig, '-_', '+/'));
+			$data = json_decode(base64_decode(strtr($payload, '-_', '+/'), TRUE));
+			return $data;
+		}
+		return FALSE;
+	}
+
 }
 
 /* End of file ciconnect.php */
